@@ -22,8 +22,8 @@ select
     sod.productid,
     c.customerid,
     ca.addressid,
-    soh.shiptoaddressid,
     soh.billtoaddressid,
+    soh.shiptoaddressid,
     sum(sod.orderQty*sod.unitprice*(1-sod.unitpricediscount)) as income
 from
     saleslt.customer c
@@ -34,7 +34,7 @@ join
 join
     saleslt.salesorderdetail sod on soh.salesorderid = sod.salesorderid
 group by
-    CUBE(sod.productid, c.customerid, ca.addressid, soh.shiptoaddressid, soh.billtoaddressid)
+    grouping sets (cube(sod.productid, c.customerid, ca.addressid), cube(sod.productid, c.customerid, soh.billtoaddressid), cube(sod.productid, c.customerid, soh.shiptoaddressid))
 order by
     income desc;
 --2B==================================================================
@@ -113,10 +113,10 @@ join
 join
     saleslt.salesorderdetail sod on soh.salesorderid = sod.salesorderid
 group by
-    rollup(
     sod.productid,
     c.customerid,
     c.salesperson,
+    rollup(
     a.countryregion,
     a.stateprovince,
     a.city

@@ -1,12 +1,14 @@
 --1A==================================================================
-select
-    customerid,
+    select
+    rank() over (order by count(customerid) desc) as rank,
     salesperson,
-    sum(1) over (order by salesperson asc) as rank
-from 
+    count(customerid) as count_of_customers
+from
     saleslt.customer
-order by 
-    customerid desc;
+group by
+    salesperson
+order by
+    rank asc;
 --1A==================================================================
 
 
@@ -51,7 +53,7 @@ order by
 
 --2A==================================================================
 select
-    percent_rank() over(order by count(c.customerid) asc) as rank,
+    percent_rank() over(partition by a.countryregion order by count(c.customerid) asc) as rank,
     a.countryregion,
     a.stateprovince,
     count(c.customerid) as count_of_customers
@@ -64,7 +66,7 @@ join
 group by
     a.countryregion, a.stateprovince
 order by
-    rank, a.countryregion, a.stateprovince;
+    a.countryregion, rank, a.stateprovince;
 --2A==================================================================
 
 
